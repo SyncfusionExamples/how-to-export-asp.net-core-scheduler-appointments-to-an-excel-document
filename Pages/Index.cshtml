@@ -1,0 +1,49 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+    var appData = new AppointmentData().GetScheduleData();
+}
+
+<ejs-schedule id="schedule"
+              currentView="Month"
+              selectedDate="new DateTime(2024,01,10)"
+              actionBegin="onActionBegin">
+    <e-schedule-eventsettings datasource="appData">
+    </e-schedule-eventsettings>
+</ejs-schedule>
+
+<script>
+    function onActionBegin(args) {
+        if (args.requestType === 'toolbarItemRendering'){
+            var exportItem = {
+                text: 'Excel Export',
+                prefixIcon: 'e-icons e-export-excel',
+                click: onExportClick
+            };
+            args.items.push(exportItem);
+        }
+    }
+
+    function onExportClick(){
+        var customFields = [
+            { name: 'Subject', text: 'Summary' },
+            { name: 'StartTime', text: 'Start Date' },
+            { name: 'EndTime', text: 'End Date' },
+            { name: 'Location', text: 'Place' }
+        ]
+        var exportOptions = {
+            fieldsInfo: customFields,
+            fileName: 'Appointments',
+            includeOccurrences: true,
+            exportType: 'csv',
+            fields: ['Id', 'Subject', 'StartTime', 'EndTime', 'Location'],
+            customData: [
+                { Id: 1, Subject: 'Scrum Meeting', StartTime: new Date(2019, 0, 6, 9, 30), EndTime: new Date(2019, 0, 6, 11, 0), Location: 'Newyork City', },
+                { Id: 2, Subject: 'PO Meeting', StartTime: new Date(2019, 0, 7, 9, 30), EndTime: new Date(2019, 0, 7, 11, 0), Location: 'Newyork City', },
+                { Id: 3, Subject: 'Lead Training', StartTime: new Date(2019, 0, 8, 9, 30), EndTime: new Date(2019, 0, 8, 11, 0), Location: 'Newyork City', }
+            ]
+        };
+        document.getElementById('schedule').ej2_instances[0].exportToExcel(exportOptions);
+    }
+</script>
